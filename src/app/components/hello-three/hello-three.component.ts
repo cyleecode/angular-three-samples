@@ -19,24 +19,39 @@ export class HelloThreeComponent implements AfterViewInit {
     }
 }
 
+//setup scene camera and renderer
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 
-const geometry = new THREE.BoxGeometry(1, 1, 1)
+//setup 3D object
+const geometry = new THREE.BoxGeometry(3, 3, 3)
 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
 const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
+const cubeArray: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>[] = []
+for (let i = 0; i < 10; i++) {
+    cubeArray.push(cube.clone())
+}
 
-camera.position.z = 5
+//add and configure object
+scene.add(...cubeArray)
+let start_index = -15
+for (let c of cubeArray) {
+    c.position.set(start_index, start_index, 0)
+    start_index += 4
+}
 
+//setup view
+camera.position.x = 10
+camera.position.z = 20
+
+//target animation
 function animate() {
     requestAnimationFrame(animate)
-
-    cube.rotation.x += 0.01
-    cube.rotation.y += 0.01
-
+    for (let c of cubeArray) {
+        c.rotation.x += 0.02
+        c.rotation.y += 0.02
+    }
     renderer.render(scene, camera)
 }

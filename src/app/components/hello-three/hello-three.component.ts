@@ -10,12 +10,21 @@ import * as THREE from 'three'
 })
 export class HelloThreeComponent implements AfterViewInit {
     @ViewChild('helloThree') square_scene!: ElementRef<HTMLElement>
-
+    cameraX = 0
+    cameraY = 0
+    cameraZ = 0
     constructor() {}
 
     ngAfterViewInit(): void {
         this.square_scene.nativeElement.appendChild(renderer.domElement)
         animate()
+
+        // camera.position.set(0, 0, 100)
+        // setInterval(() => {
+        //     camera.lookAt(this.cameraX, this.cameraY, this.cameraZ)
+        //     this.cameraX -= 0.1
+        //     this.cameraY += 0.2
+        // })
     }
 }
 
@@ -33,12 +42,25 @@ const cubeArray: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>[] = []
 for (let i = 0; i < 10; i++) {
     cubeArray.push(cube.clone())
 }
+// Line 3D
+const line_material = new THREE.LineBasicMaterial({ color: 0x0000ff })
+const points = []
+points.push(new THREE.Vector3(-10, 0, 0))
+points.push(new THREE.Vector3(-9, 3, 0))
+points.push(new THREE.Vector3(20, 10, 0))
+points.push(new THREE.Vector3(10, 0, 0))
+points.push(new THREE.Vector3(5, 13, 7))
+points.push(new THREE.Vector3(10, 16, 2))
+points.push(new THREE.Vector3(20, -10, -30))
+
+const line_geometry = new THREE.BufferGeometry().setFromPoints(points)
+const line = new THREE.Line(line_geometry, line_material)
 
 //add and configure object
-scene.add(...cubeArray)
+scene.add(...cubeArray, line)
 let start_index = -15
 for (let c of cubeArray) {
-    c.position.set(start_index, start_index, 0)
+    c.position.set(start_index, start_index, 2)
     start_index += 4
 }
 
@@ -49,9 +71,9 @@ camera.position.z = 20
 //target animation
 function animate() {
     requestAnimationFrame(animate)
-    for (let c of cubeArray) {
-        c.rotation.x += 0.02
-        c.rotation.y += 0.02
-    }
+    // for (let c of cubeArray) {
+    //     c.rotation.x += 0.02
+    //     c.rotation.y += 0.02
+    // }
     renderer.render(scene, camera)
 }

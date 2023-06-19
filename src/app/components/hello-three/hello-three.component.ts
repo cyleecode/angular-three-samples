@@ -1,6 +1,11 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import * as THREE from 'three'
+
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+
 @Component({
     selector: 'app-hello-three',
     standalone: true,
@@ -27,6 +32,29 @@ export class HelloThreeComponent implements AfterViewInit {
         // })
     }
 }
+
+//Object Loader
+const loader = new GLTFLoader()
+loader.load(
+    '/assets/Soldier.glb',
+    function (gltf) {
+        scene.add(gltf.scene)
+
+        gltf.animations // Array<THREE.AnimationClip>
+        gltf.scene // THREE.Group
+        gltf.scenes // Array<THREE.Group>
+        gltf.cameras // Array<THREE.Camera>
+        gltf.asset // Object
+    },
+    // called while loading is progressing
+    function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    },
+    // called when loading has errors
+    function (error) {
+        console.log('An error happened')
+    }
+)
 
 //setup scene camera and renderer
 const scene = new THREE.Scene()
@@ -57,7 +85,7 @@ const line_geometry = new THREE.BufferGeometry().setFromPoints(points)
 const line = new THREE.Line(line_geometry, line_material)
 
 //add and configure object
-scene.add(...cubeArray, line)
+// scene.add(...cubeArray, line)
 let start_index = -15
 for (let c of cubeArray) {
     c.position.set(start_index, start_index, 2)

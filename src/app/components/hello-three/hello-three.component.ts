@@ -16,7 +16,11 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 export class HelloThreeComponent implements AfterViewInit {
     @ViewChild('helloThree') square_scene!: ElementRef<HTMLElement>
 
-    constructor() {}
+    constructor() {
+        init()
+        animate()
+        window.addEventListener('resize', onWindowResize)
+    }
 
     ngAfterViewInit(): void {
         this.square_scene.nativeElement.appendChild(renderer.domElement)

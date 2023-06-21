@@ -55,6 +55,11 @@ function init() {
     //set size to whole window
     renderer.setSize(window.innerWidth, window.innerHeight)
 
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.update()
+    //Geo helper
+    const axes_helper = new THREE.AxesHelper(2)
+    scene.add(axes_helper)
     //3D Object
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })

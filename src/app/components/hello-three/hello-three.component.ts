@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter'
 
 @Component({
     selector: 'app-hello-three',
@@ -75,4 +76,28 @@ function animate() {
     cube.rotation.x += 0.01
 
     renderer.render(scene, camera)
+}
+
+function exportGLTF() {
+    const exporter = new GLTFExporter()
+
+    // Parse the input and generate the glTF output
+    exporter.parse(
+        scene,
+        // called when the gltf has been generated
+        function (gltf) {
+            let dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(gltf))
+            let dlAnchorElem = document.getElementById('downloadAnchorElem')
+            if (dlAnchorElem) {
+                dlAnchorElem.setAttribute('href', dataStr)
+                dlAnchorElem.setAttribute('download', 'mygltf.json')
+                dlAnchorElem.click()
+            }
+        },
+        // called when there is an error in the generation
+        function (error) {
+            console.log(error)
+            console.log('An error happened')
+        }
+    )
 }

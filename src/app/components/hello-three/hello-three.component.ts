@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import * as THREE from 'three'
+import * as CANNON from 'cannon-es'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
@@ -28,7 +29,44 @@ export class HelloThreeComponent implements AfterViewInit {
     }
 }
 
+let ground_mesh: THREE.Mesh
 let scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer, cube: any
+
+//Setup Cannon
+//world phys
+const world = new CANNON.World({
+    gravity: new CANNON.Vec3(0, -9.81, 0)
+})
+const timeStep = 1 / 60
+
+//cannon material
+const groundMat = new CANNON.Material('ground')
+const boxMat = new CANNON.Material('box')
+const contactMaterial = new CANNON.ContactMaterial(groundMat, boxMat, {
+    restitution: 0.4
+})
+//ground phys body
+const groundBody = new CANNON.Body({
+    // shape: new CANNON.Plane(),
+    shape: new CANNON.Box(new CANNON.Vec3(5, 5, 0)),
+    type: CANNON.Body.STATIC,
+    material: groundMat
+})
+groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
+//box phys body
+const boxBody = new CANNON.Body({
+    mass: 2,
+    shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
+    position: new CANNON.Vec3(0, 15, 0),
+    material: boxMat
+})
+//some phys behavior
+boxBody.linearDamping = 0.02
+boxBody.angularVelocity.set(3, 0, 0)
+
+world.addBody(boxBody)
+world.addBody(groundBody)
+world.addContactMaterial(contactMaterial)
 
 function init() {
     scene = new THREE.Scene()
@@ -55,19 +93,33 @@ function init() {
     //set size to whole window
     renderer.setSize(window.innerWidth, window.innerHeight)
 
+    //Orbital control
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.update()
     //Geo helper
     const axes_helper = new THREE.AxesHelper(2)
     scene.add(axes_helper)
     //3D Object
-    const geometry = new THREE.BoxGeometry(1, 1, 1)
+    //box
+    const geometry = new THREE.BoxGeometry(2, 2, 2)
     // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
     const texture = new THREE.TextureLoader().load('textures/asdf.gif')
     const material = new THREE.MeshBasicMaterial({ map: texture })
     cube = new THREE.Mesh(geometry, material)
     scene.add(cube)
-    camera.position.z = 3
+
+    //wall
+    const groundGeo = new THREE.PlaneGeometry(10, 10)
+    const groundMat = new THREE.MeshBasicMaterial({
+        color: '#ffffff',
+        side: THREE.DoubleSide,
+        wireframe: true
+    })
+    ground_mesh = new THREE.Mesh(groundGeo, groundMat)
+    scene.add(ground_mesh)
+
+    //set camera range
+    camera.position.z = 15
 }
 
 function onWindowResize() {
@@ -77,6 +129,16 @@ function onWindowResize() {
 }
 
 function animate() {
+    //Add world phys
+    world.step(timeStep)
+    if (ground_mesh) {
+        //Animate only when mesh loaded
+        ground_mesh.position.copy(groundBody.position as any)
+        ground_mesh.quaternion.copy(groundBody.quaternion as any)
+        cube.position.copy(boxBody.position as any)
+        cube.quaternion.copy(boxBody.quaternion as any)
+    }
+
     requestAnimationFrame(animate)
     cube.rotation.x += 0.01
 

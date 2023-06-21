@@ -23,39 +23,46 @@ export class HelloThreeComponent implements AfterViewInit {
     }
 }
 
-/* ! Scene */
-const scene = new THREE.Scene()
-/* ! Camera */
-let camera: any
-// Perspective projection (P)
-// view from camera
-// ->
-// Far clip plane -> normal ratio
-// Near clip plane -> smaller ratio
+let scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer, cube: any
 
-// Orthographic projection (O)
-// view from camera
-// ->
-// Far clip plane &
-// Near clip plane -> same ratio
-camera = new THREE.PerspectiveCamera(
-    75, //75 degree
-    window.innerWidth / window.innerHeight, //display ratio
-    0.1, //near plane
-    1000 //far plane
-)
+function init() {
+    scene = new THREE.Scene()
+    // Perspective projection (P)
+    // view from camera
+    // ->
+    // Far clip plane -> normal ratio
+    // Near clip plane -> smaller ratio
 
-/* ! Renderer */
-const renderer = new THREE.WebGLRenderer({ antialias: true })
-//set size to whole window
-renderer.setSize(window.innerWidth, window.innerHeight)
+    // Orthographic projection (O)
+    // view from camera
+    // ->
+    // Far clip plane &
+    // Near clip plane -> same ratio
+    camera = new THREE.PerspectiveCamera(
+        75, //75 degree
+        window.innerWidth / window.innerHeight, //display ratio
+        0.1, //near plane
+        1000 //far plane
+    )
 
-//3D Object
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
-camera.position.z = 3
+    /* ! Renderer */
+    renderer = new THREE.WebGLRenderer({ antialias: true })
+    //set size to whole window
+    renderer.setSize(window.innerWidth, window.innerHeight)
+
+    //3D Object
+    const geometry = new THREE.BoxGeometry(1, 1, 1)
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    cube = new THREE.Mesh(geometry, material)
+    scene.add(cube)
+    camera.position.z = 3
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+}
 
 function animate() {
     requestAnimationFrame(animate)
@@ -63,4 +70,3 @@ function animate() {
 
     renderer.render(scene, camera)
 }
-animate()

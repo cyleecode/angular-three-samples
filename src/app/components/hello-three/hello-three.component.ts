@@ -46,7 +46,7 @@ camera = new THREE.PerspectiveCamera(
 )
 
 /* ! Renderer */
-const renderer = new THREE.WebGLRenderer()
+const renderer = new THREE.WebGLRenderer({ antialias: true })
 //set size to whole window
 renderer.setSize(window.innerWidth, window.innerHeight)
 

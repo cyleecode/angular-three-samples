@@ -56,7 +56,9 @@ function init() {
 
     //3D Object
     const geometry = new THREE.BoxGeometry(1, 1, 1)
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    const texture = new THREE.TextureLoader().load('textures/asdf.gif')
+    const material = new THREE.MeshBasicMaterial({ map: texture })
     cube = new THREE.Mesh(geometry, material)
     scene.add(cube)
     camera.position.z = 3
